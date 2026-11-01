@@ -339,13 +339,14 @@ class User(RockerExtension):
         self._env_subs = None
         self.name = User.get_name()
 
-    def get_home_dir(self, cliargs):
+    @staticmethod
+    def get_home_dir(cliargs):
         """Return the home directory of the user created in the container."""
         if 'user_override_home' in cliargs and cliargs['user_override_home']:
             return cliargs['user_override_home']
         if 'user_override_name' in cliargs and cliargs['user_override_name']:
             return os.path.join('/home/', cliargs['user_override_name'])
-        return self.get_environment_subs()['dir']
+        return pwd.getpwuid(os.getuid()).pw_dir
 
     def get_snippet(self, cliargs):
         snippet = pkgutil.get_data('rocker', 'templates/%s_snippet.Dockerfile.em' % self.name).decode('utf-8')
